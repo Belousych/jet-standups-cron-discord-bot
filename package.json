@@ -1,9 +1,12 @@
 {
+  "name": "jet-standups-cron-discord-bot",
+  "version": "0.1.0",
   "scripts": {
     "start": "node index.js"
   },
   "dependencies": {
     "cron": "^2.2.0",
     "superagent": "^8.0.6"
-  }
+  },
+  "license": "MIT"
 }
