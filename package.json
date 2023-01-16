@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "start": "set YANDEX_OAUTH_TOKEN=y0_AgAAAAAHW-CIAADLWwAAAADZl8FGy8UKDpf6QYuDsfIcow7qcr_ifug&& node index.js"
+    "start": "node index.js"
   },
   "dependencies": {
     "axios": "^1.2.2",
