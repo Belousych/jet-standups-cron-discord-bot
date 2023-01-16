@@ -1,0 +1,11 @@
+{
+  "scripts": {
+    "start": "set YANDEX_OAUTH_TOKEN=y0_AgAAAAAHW-CIAADLWwAAAADZl8FGy8UKDpf6QYuDsfIcow7qcr_ifug&& node index.js"
+  },
+  "dependencies": {
+    "axios": "^1.2.2",
+    "cron": "^2.2.0",
+    "form-data": "^4.0.0",
+    "superagent": "^8.0.6"
+  }
+}
