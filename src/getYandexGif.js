@@ -16,6 +16,10 @@ const getYandexGif = async () => {
         const itemsFiltered = items.filter(i => !used_id.includes(i.resource_id) && i.size < 8388608)
         const randomItem = get_random(itemsFiltered)
 
+        if (!items.length) {
+            used_id = []
+        }
+
         if (randomItem) {
             if (process.env.YANDEX_OAUTH_TOKEN) {
                 await superagent
@@ -27,11 +31,19 @@ const getYandexGif = async () => {
             } else {
                 used_id.push(randomItem.resource_id)
             }
-            return randomItem.file
+            return {
+                total: itemsFiltered.length - 1,
+                url: randomItem.file
+            }
         } else {
             return null
         }
+    } else {
+        used_id = []
+        return null
     }
+
+
 }
 
 module.exports = getYandexGif

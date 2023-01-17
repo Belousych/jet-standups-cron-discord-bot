@@ -1,3 +1,4 @@
+const superagent = require('superagent');
 const { gifQ, GIF_URL } = require('./config')
 const { get_random } = require("./utils");
 
@@ -36,4 +37,4 @@ const findRandomGifs = async () => {
 
 }
 
-module.export = findRandomGifs
+module.exports = findRandomGifs
