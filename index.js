@@ -23,7 +23,7 @@ const sendMessage = async () => {
 
 
 // sendMessage()
-new CronJob('27 10 * * 1-5', () => {
+new CronJob('27 9 * * 1-5', () => {
     sendMessage()
 }, null,
     true, 'Asia/Yekaterinburg').start()

@@ -20,7 +20,10 @@ const gifQ = [
     "команда",
     "пожалуйста",
     "работа",
-    "работ"
+    "работ",
+    "мотивация",
+    "do it",
+    "эй"
 ]
 
 module.exports = { WEBHOOK_URL, GIF_URL, YANDEX_PUBLIC_FOLDER, gifQ }
