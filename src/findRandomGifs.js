@@ -2,13 +2,11 @@ const superagent = require('superagent');
 const { gifQ, GIF_URL } = require('./config')
 const { get_random } = require("./utils");
 
-const findRandomGifs = async () => {
+const findRandomGifs = async (gifs = []) => {
     let delay = 0; const delayIncrement = 250;
     let mergedArray = []
 
-
-
-    const promises = gifQ.map((q) => {
+    const promises = gifs.map((q) => {
         delay += delayIncrement;
         return new Promise(resolve => setTimeout(resolve, delay)).then(() => {
             return superagent.get(`${GIF_URL}?q=${encodeURIComponent(q)}&media_format=mp4&provider=tenor&locale=ru`).retry(5).then(res => {

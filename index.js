@@ -2,7 +2,7 @@ const CronJob = require('cron').CronJob
 const superagent = require('superagent');
 const message = require('./message.json');
 const calendar = require('./superjob2023.json');
-const { WEBHOOK_URL } = require('./src/config');
+const { gifQ, WEBHOOK_URL } = require('./src/config');
 const findRandomGifs = require('./src/findRandomGifs');
 const getYandexGif = require('./src/getYandexGif');
 const { declOfNum } = require('./src/utils');
@@ -10,14 +10,14 @@ const { declOfNum } = require('./src/utils');
 const sendMessage = async () => {
     let today = new Date().toISOString().slice(0, 10);
     if (calendar && calendar?.holidays && calendar?.holidays.includes(today)) {
-        return 
+        return
     }
 
 
     const yandexResponse = await getYandexGif()
-    const gifUrl = yandexResponse?.url || await findRandomGifs()
+    const gifUrl = yandexResponse?.url || await findRandomGifs(gifQ)
 
-    const file  = await superagent.get(gifUrl).responseType('blob').then(res => res.body)
+    const file = await superagent.get(gifUrl).responseType('blob').then(res => res.body)
     const messageNext = { ...message }
     messageNext.content = `${message.content} \n\n[GIF](${gifUrl})`
     const total = yandexResponse?.total
@@ -30,10 +30,37 @@ const sendMessage = async () => {
 }
 
 
+const sendMessageTea = async () => {
+    let today = new Date().toISOString().slice(0, 10);
+    if (calendar && calendar?.holidays && calendar?.holidays.includes(today)) {
+        return
+    }
+
+
+
+    const gifUrl = await findRandomGifs(["tea", "чай"])
+
+
+    const messageNext = { ...message }
+    messageNext.content = `Пора пить чай! \n\n https://jetstyle.zoom.us/j/84948712630?pwd=WmhPMHV0aEhaajVZUGJTa1RNbWNrQT09 \n\n[GIF](${gifUrl})`
+
+    const req = superagent.post(WEBHOOK_URL).field("payload_json", JSON.stringify(messageNext))
+
+    await req.then((res) => res.body).catch(error => error)
+}
+
+
 
 // sendMessage()
+// sendMessageTea()
 new CronJob('30 9 * * 1-5', () => {
     sendMessage()
+}, null,
+    true, 'Asia/Yekaterinburg').start()
+
+
+new CronJob('00 16 * * 5', () => {
+    sendMessageTea()
 }, null,
     true, 'Asia/Yekaterinburg').start()
 
