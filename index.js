@@ -42,7 +42,7 @@ const sendMessageTea = async () => {
 
 
     const messageNext = { ...message }
-    messageNext.content = `Пора пить чай! \n\n https://jetstyle.zoom.us/j/84948712630?pwd=WmhPMHV0aEhaajVZUGJTa1RNbWNrQT09 \n\n[GIF](${gifUrl})`
+    messageNext.content = `@everyone! Пора пить чай! \n\n https://jetstyle.zoom.us/j/84948712630?pwd=WmhPMHV0aEhaajVZUGJTa1RNbWNrQT09 \n\n[GIF](${gifUrl})`
 
     const req = superagent.post(WEBHOOK_URL).field("payload_json", JSON.stringify(messageNext))
 
