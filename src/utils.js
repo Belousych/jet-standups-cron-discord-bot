@@ -2,6 +2,14 @@ function get_random(list) {
     return list[Math.floor((Math.random() * list.length))];
 }
 
+
+function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      let j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+  }
+
 // /**
 //  * Склонение числительных
 //  * @param {Number} number число которое склоняем
@@ -16,4 +24,4 @@ function declOfNum(number, titles) {
     ]
 }
 
-module.exports = { get_random, declOfNum }
+module.exports = { get_random, declOfNum, shuffle }

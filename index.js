@@ -38,7 +38,7 @@ const sendMessageTea = async () => {
 
 
 
-    const gifUrl = await findRandomGifs(["tea", "чай"])
+    const gifUrl = await findRandomGifs(["tea", "чай", "пью чай"])
 
 
     const messageNext = { ...message }
