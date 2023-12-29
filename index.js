@@ -1,8 +1,8 @@
 const CronJob = require('cron').CronJob
 const superagent = require('superagent');
 const message = require('./message.json');
-const calendar = require('./superjob2023.json');
-const { gifQ, WEBHOOK_URL } = require('./src/config');
+const calendar = require('./superjob2024.json');
+const { gifQ, WEBHOOK_URL, getDrinkGif } = require('./src/config');
 const findRandomGifs = require('./src/findRandomGifs');
 const getYandexGif = require('./src/getYandexGif');
 const { declOfNum } = require('./src/utils');
@@ -36,14 +36,13 @@ const sendMessageTea = async () => {
         return
     }
 
+    const drinkGifs = getDrinkGif()
 
-
-    const gifUrl = await findRandomGifs(["tea", "tea time", "чай", "пью чай", "пить чай", "безумное чаепитие", "чаепитие"])
-    // const gifUrl = await findRandomGifs(["cider", "сидр", "пью сидр"])
+    const gifUrl = await findRandomGifs(drinkGifs.gifs)
 
 
     const messageNext = { ...message }
-    messageNext.content = `@everyone! Пора пить чай! \n\n https://jetstyle.zoom.us/j/84795605228?pwd=YzumeOb35bQ4FFcBAHQLKO4Q3CR7Mq.1 \n\n[GIF](${gifUrl})`
+    messageNext.content = `@everyone! Пора пить ${drinkGifs.name}! \n\n https://jetstyle.zoom.us/j/84795605228?pwd=YzumeOb35bQ4FFcBAHQLKO4Q3CR7Mq.1 \n\n[GIF](${gifUrl})`
 
     const req = superagent.post(WEBHOOK_URL).field("payload_json", JSON.stringify(messageNext))
 
