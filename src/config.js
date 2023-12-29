@@ -26,4 +26,12 @@ const gifQ = [
     "эй"
 ]
 
+
+const gifTea = ["tea", "tea time", "чай", "пью чай", "пить чай", "безумное чаепитие", "чаепитие"]
+const gifCoffee = ["coffee", "coffee time", "кофе", "пью кофе", "пить кофе", "кофе брейк"]
+const gifCider = ["cider", "сидр", "пью сидр", "пить сидр"]
+const gifVodka = ["vodka", "водка", "пью водку", "пить водку"]
+
+
+
 module.exports = { WEBHOOK_URL, GIF_URL, YANDEX_PUBLIC_FOLDER, gifQ }

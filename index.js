@@ -38,12 +38,12 @@ const sendMessageTea = async () => {
 
 
 
-    // const gifUrl = await findRandomGifs(["tea", "чай", "пью чай"])
-    const gifUrl = await findRandomGifs(["cider", "сидр", "пью сидр"])
+    const gifUrl = await findRandomGifs(["tea", "tea time", "чай", "пью чай", "пить чай", "безумное чаепитие", "чаепитие"])
+    // const gifUrl = await findRandomGifs(["cider", "сидр", "пью сидр"])
 
 
     const messageNext = { ...message }
-    messageNext.content = `@everyone! Пора пить сидр! \n\n https://jetstyle.zoom.us/j/84948712630?pwd=WmhPMHV0aEhaajVZUGJTa1RNbWNrQT09 \n\n[GIF](${gifUrl})`
+    messageNext.content = `@everyone! Пора пить чай! \n\n https://jetstyle.zoom.us/j/84795605228?pwd=YzumeOb35bQ4FFcBAHQLKO4Q3CR7Mq.1 \n\n[GIF](${gifUrl})`
 
     const req = superagent.post(WEBHOOK_URL).field("payload_json", JSON.stringify(messageNext))
 
