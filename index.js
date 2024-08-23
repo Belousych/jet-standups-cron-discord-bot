@@ -31,8 +31,11 @@ const sendMessage = async () => {
 
 
 const sendMessageTea = async () => {
+    console.log("sendMessageTea started");
     let today = new Date().toISOString().slice(0, 10);
+    console.log("Today's date:", today);
     if (calendar && calendar?.holidays && calendar?.holidays.includes(today)) {
+        console.log("Today is a holiday. Exiting sendMessageTea.");
         return
     }
 
@@ -54,12 +57,14 @@ const sendMessageTea = async () => {
 // sendMessage()
 // sendMessageTea()
 new CronJob('30 9 * * 1-5', () => {
+    console.log("CronJob for sendMessage triggered");
     sendMessage()
 }, null,
     true, 'Asia/Yekaterinburg').start()
 
 
 new CronJob('00 16 * * 5', () => {
+    console.log("CronJob for sendMessageTea triggered");
     sendMessageTea()
 }, null,
     true, 'Asia/Yekaterinburg').start()
