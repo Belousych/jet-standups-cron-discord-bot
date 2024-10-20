@@ -22,11 +22,11 @@ const getYandexGif = async () => {
 
         if (randomItem) {
             if (process.env.YANDEX_OAUTH_TOKEN) {
-                await superagent
-                    .delete(encodeURI(`https://cloud-api.yandex.net/v1/disk/resources?path=/${folder.name}${randomItem.path}`))
-                    .set('Authorization', `OAuth ${process.env.YANDEX_OAUTH_TOKEN}`)
-                    .then(res => res.body)
-                    .catch(error => console.error(error))
+                // await superagent
+                //     .delete(encodeURI(`https://cloud-api.yandex.net/v1/disk/resources?path=/${folder.name}${randomItem.path}`))
+                //     .set('Authorization', `OAuth ${process.env.YANDEX_OAUTH_TOKEN}`)
+                //     .then(res => res.body)
+                //     .catch(error => console.error(error))
                 used_id.push(randomItem.resource_id)
             } else {
                 used_id.push(randomItem.resource_id)

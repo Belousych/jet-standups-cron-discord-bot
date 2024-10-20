@@ -124,3 +124,5 @@ const sendMessageTea = async () => {
 // }, null, true, 'Asia/Yekaterinburg').start();
 
 sendMessage();
+
+sendMessageTea();
