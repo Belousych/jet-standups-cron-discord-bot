@@ -20,7 +20,7 @@ const TELEGRAM_API_URL_PICTURE = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/
 const sendMessage = async () => {
   let today = new Date().toISOString().slice(0, 10);
   if (calendar && calendar?.holidays && calendar?.holidays.includes(today)) {
-    // return;
+    return;
   }
 
   const yandexResponse = await getYandexGif();
@@ -112,17 +112,17 @@ const sendMessageTea = async () => {
 };
 
 // Расписание для sendMessage
-// new CronJob('30 9 * * 1-5', () => {
-//     console.log("CronJob for sendMessage triggered");
-//     sendMessage();
-// }, null, true, 'Asia/Yekaterinburg').start();
+new CronJob('30 9 * * 1-5', () => {
+    console.log("CronJob for sendMessage triggered");
+    sendMessage();
+}, null, true, 'Asia/Yekaterinburg').start();
 
-// // Расписание для sendMessageTea
-// new CronJob('00 16 * * 5', () => {
-//     console.log("CronJob for sendMessageTea triggered");
-//     sendMessageTea();
-// }, null, true, 'Asia/Yekaterinburg').start();
+// Расписание для sendMessageTea
+new CronJob('00 16 * * 5', () => {
+    console.log("CronJob for sendMessageTea triggered");
+    sendMessageTea();
+}, null, true, 'Asia/Yekaterinburg').start();
 
-sendMessage();
+// sendMessage();
 
-sendMessageTea();
+// sendMessageTea();
