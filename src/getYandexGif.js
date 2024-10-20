@@ -27,13 +27,14 @@ const getYandexGif = async () => {
                     .set('Authorization', `OAuth ${process.env.YANDEX_OAUTH_TOKEN}`)
                     .then(res => res.body)
                     .catch(error => console.error(error))
-                // used_id.push(randomItem.resource_id)
+                used_id.push(randomItem.resource_id)
             } else {
                 used_id.push(randomItem.resource_id)
             }
             return {
                 total: itemsFiltered.length - 1,
-                url: randomItem.file
+                url: randomItem.file,
+                ...randomItem,
             }
         } else {
             return null

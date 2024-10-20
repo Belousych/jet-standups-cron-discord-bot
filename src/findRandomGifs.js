@@ -38,4 +38,28 @@ const findRandomGifs = async (gifs = []) => {
 
 }
 
-module.exports = findRandomGifs
+async function getRandomGif(query) {
+    try {
+        const response = await superagent
+            .get('https://api.giphy.com/v1/gifs/search')
+            .query({
+                api_key: process.env.API_KEY_GIPHY,
+                q: query,
+                limit: 50
+            });
+
+        // Маппим результаты на массив ссылок
+        const gifs = response.body.data.map(gif => gif.images.original.url);
+        const item = get_random(gifs)
+        return item;
+    } catch (error) {
+        console.error('Error fetching GIFs:', error);
+        return [];
+    }
+}
+
+
+module.exports = {
+    findRandomGifs,
+    getRandomGif
+}
