@@ -17,6 +17,8 @@ const { declOfNum, get_random } = require("./src/utils");
 const TELEGRAM_API_URL = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendAnimation`;
 const TELEGRAM_API_URL_PICTURE = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendPhoto`;
 
+const message_thread_id = 48 // standups thread id
+
 const sendMessage = async () => {
   let today = new Date().toISOString().slice(0, 10);
   if (calendar && calendar?.holidays && calendar?.holidays.includes(today)) {
@@ -62,6 +64,7 @@ const sendMessage = async () => {
     .send({
       chat_id: TELEGRAM_CHAT_ID,
       [mediaField]: gifUrl,
+      message_thread_id: message_thread_id,
       caption: `**Доброе утро, @everyone !!!**
 
 До 11:00 ЕКБ оставьте в чате сообщение, которое отвечает на **три вопроса**:
@@ -104,6 +107,7 @@ const sendMessageTea = async () => {
     .post(TELEGRAM_API_URL)
     .send({
       chat_id: TELEGRAM_CHAT_ID,
+      message_thread_id: message_thread_id,
       animation: gifUrl,
       caption: messageNext,
     })
