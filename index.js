@@ -116,7 +116,7 @@ const sendMessageTea = async () => {
 };
 
 // Расписание для sendMessage
-new CronJob('30 9 * * 1-5', () => {
+new CronJob('30 9 * * 1-6', () => {
     console.log("CronJob for sendMessage triggered");
     sendMessage();
 }, null, true, 'Asia/Yekaterinburg').start();
