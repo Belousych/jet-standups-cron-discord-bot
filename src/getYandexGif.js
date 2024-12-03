@@ -1,5 +1,5 @@
 const superagent = require("superagent");
-const { YANDEX_PUBLIC_FOLDER, YANDEX_TARGET_FOLDER } = require("./config");
+const { YANDEX_PUBLIC_FOLDER, FROM_FOLDER, TARGET_FOLDER, YANDEX_OAUTH_TOKEN } = require("./config");
 const { get_random } = require("./utils");
 
 let used_id = [];
@@ -25,17 +25,17 @@ const getYandexGif = async () => {
     }
 
     if (randomItem) {
-      if (process.env.YANDEX_OAUTH_TOKEN) {
+      if (YANDEX_OAUTH_TOKEN) {
         try {
           await superagent
             .post(
               `https://cloud-api.yandex.net/v1/disk/resources/move?from=${encodeURIComponent(
-                randomItem.path
+                `disk:/${FROM_FOLDER}/${randomItem.name}`
               )}&path=${encodeURIComponent(
-                `disk:/${YANDEX_TARGET_FOLDER}/${randomItem.name}`
+                `disk:/${TARGET_FOLDER}/${randomItem.name}`
               )}`
             )
-            .set("Authorization", `OAuth ${process.env.YANDEX_OAUTH_TOKEN}`)
+            .set("Authorization", `OAuth ${YANDEX_OAUTH_TOKEN}`)
             .catch((error) => console.error("Move error:", error));
 
           used_id.push(randomItem.resource_id);
@@ -45,7 +45,7 @@ const getYandexGif = async () => {
         }
         // await superagent
         //     .delete(encodeURI(`https://cloud-api.yandex.net/v1/disk/resources?path=/${folder.name}${randomItem.path}`))
-        //     .set('Authorization', `OAuth ${process.env.YANDEX_OAUTH_TOKEN}`)
+        //     .set('Authorization', `OAuth ${YANDEX_OAUTH_TOKEN}`)
         //     .then(res => res.body)
         //     .catch(error => console.error(error))
         

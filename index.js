@@ -16,8 +16,10 @@ const { declOfNum, get_random } = require("./src/utils");
 // Telegram API URL
 const TELEGRAM_API_URL = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendAnimation`;
 const TELEGRAM_API_URL_PICTURE = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendPhoto`;
+const TELEGRAM_API_URL_TEXT = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`;
 
-const message_thread_id = 48 // standups thread id
+const message_thread_id = 48; // standups thread id
+const message_thread_id_work_log = 40; // work log thread id
 
 const sendMessage = async () => {
   let today = new Date().toISOString().slice(0, 10);
@@ -57,15 +59,15 @@ const sendMessage = async () => {
       "картинок",
     ])}.** ${total > 0 ? "Когда они кончатся я буду искать сам" : ""}`;
   }
-
-  // Отправка сообщения в Telegram через superagent
-  await superagent
-    .post(apiUrl)
-    .send({
-      chat_id: TELEGRAM_CHAT_ID,
-      [mediaField]: gifUrl,
-      message_thread_id: message_thread_id,
-      caption: `**Доброе утро, @everyone !!!**
+  try {
+    // Отправка сообщения в Telegram через superagent
+    const res = await superagent
+      .post(apiUrl)
+      .send({
+        chat_id: TELEGRAM_CHAT_ID,
+        [mediaField]: gifUrl,
+        message_thread_id: message_thread_id,
+        caption: `**Доброе утро, @everyone !!!**
 
 До 11:00 ЕКБ оставьте в чате сообщение, которое отвечает на **три вопроса**:
 
@@ -82,10 +84,26 @@ const sendMessage = async () => {
 - Ставить лайки, делать суб-обсуждения и т.п. — **очень хорошо!**
 - Постить гифки и стикеры — в меру — **хорошо!**
 `,
-      parse_mode: "Markdown",
-    })
-    // .then(res => console.log('Message sent:', res.body))
-    .catch((error) => console.error("Error sending message:", error));
+        parse_mode: "Markdown",
+      })
+      // .then(res => console.log('Message sent:', res.body))
+      .catch((error) => console.error("Error sending message:", error));
+
+    // Закрепление отправленного сообщения
+    if (res.body && res.body.result && res.body.result.message_id) {
+      const messageId = res.body.result.message_id;
+
+      await superagent
+        .post(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/pinChatMessage`)
+        .send({
+          chat_id: TELEGRAM_CHAT_ID,
+          message_id: messageId,
+        })
+        .catch((error) => console.error("Error pinning message:", error));
+    }
+  } catch (error) {
+    console.error("Error sending message:", error);
+  }
 };
 
 const sendMessageTea = async () => {
@@ -101,32 +119,102 @@ const sendMessageTea = async () => {
   const gifUrl = await getRandomGif(query);
 
   const messageNext = `@everyone! Пора пить ${drinkGifs.name}! \n\n https://jetstyle.zoom.us/j/84795605228?pwd=YzumeOb35bQ4FFcBAHQLKO4Q3CR7Mq.1`;
-
-  // Отправка сообщения в Telegram через superagent
-  await superagent
-    .post(TELEGRAM_API_URL)
-    .send({
+  try {
+    // Отправка сообщения в Telegram через superagent
+    const res = await superagent.post(TELEGRAM_API_URL).send({
       chat_id: TELEGRAM_CHAT_ID,
       message_thread_id: message_thread_id,
       animation: gifUrl,
       caption: messageNext,
-    })
+    });
     // .then(res => console.log('Tea message sent:', res.body))
-    .catch((error) => console.error("Error sending tea message:", error));
+    // .catch((error) => console.error("Error sending tea message:", error));
+
+    // Закрепление отправленного сообщения
+    if (res.body && res.body.result && res.body.result.message_id) {
+      const messageId = res.body.result.message_id;
+
+      await superagent
+        .post(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/pinChatMessage`)
+        .send({
+          chat_id: TELEGRAM_CHAT_ID,
+          message_id: messageId,
+        })
+        .catch((error) => console.error("Error pinning message:", error));
+    }
+  } catch (error) {
+    console.error("Error sendMessageTea message:", error);
+  }
 };
 
+const sendMessageWorkLog = async () => {
+  try {
+    // Отправка сообщения в Telegram через superagent
+    const res = await superagent.post(TELEGRAM_API_URL_TEXT).send({ // TODO сделать картинки
+      chat_id: TELEGRAM_CHAT_ID,
+      message_thread_id: message_thread_id_work_log,
+      text: 'Заполни ворклоги и спи спокойно!',
+    });
+
+
+     // Закрепление отправленного сообщения
+     if (res.body && res.body.result && res.body.result.message_id) {
+      const messageId = res.body.result.message_id;
+
+      await superagent
+        .post(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/pinChatMessage`)
+        .send({
+          chat_id: TELEGRAM_CHAT_ID,
+          message_id: messageId,
+        })
+        .catch((error) => console.error("Error pinning message:", error));
+    }
+    
+  } catch (error) {
+    console.error("Error sendMessageWorkLog message:", error);
+  }
+}
+
+
 // Расписание для sendMessage
-new CronJob('30 9 * * 1-6', () => {
+new CronJob(
+  "30 9 * * 1-6",
+  () => {
     console.log("CronJob for sendMessage triggered");
     sendMessage();
-}, null, true, 'Asia/Yekaterinburg').start();
+  },
+  null,
+  true,
+  "Asia/Yekaterinburg"
+).start();
 
 // Расписание для sendMessageTea
-new CronJob('00 16 * * 5', () => {
+new CronJob(
+  "00 16 * * 5",
+  () => {
     console.log("CronJob for sendMessageTea triggered");
     sendMessageTea();
-}, null, true, 'Asia/Yekaterinburg').start();
+  },
+  null,
+  true,
+  "Asia/Yekaterinburg"
+).start();
+
+
+// Расписание для sendMessageWorkLog
+new CronJob(
+  "00 18 * * 4",
+  () => {
+    console.log("CronJob for sendMessageWorkLog triggered");
+    sendMessageWorkLog();
+  },
+  null,
+  true,
+  "Asia/Yekaterinburg"
+).start();
 
 // sendMessage();
 
 // sendMessageTea();
+
+// sendMessageWorkLog();

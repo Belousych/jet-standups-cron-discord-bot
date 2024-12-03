@@ -70,6 +70,11 @@ dezalgo@^1.0.4:
     asap "^2.0.0"
     wrappy "1"
 
+dotenv@^16.4.5:
+  version "16.4.6"
+  resolved "https://registry.npmjs.org/dotenv/-/dotenv-16.4.6.tgz"
+  integrity sha512-JhcR/+KIjkkjiU8yEpaB/USlzVi3i5whwOjpIRNGi9svKEXZSe+Qp6IWAjFjv+2GViAoDRCUv/QLNziQxsLqDg==
+
 fast-safe-stringify@^2.1.1:
   version "2.1.1"
   resolved "https://registry.npmjs.org/fast-safe-stringify/-/fast-safe-stringify-2.1.1.tgz"

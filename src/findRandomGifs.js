@@ -54,7 +54,7 @@ async function getRandomGif(query) {
         return item;
     } catch (error) {
         console.error('Error fetching GIFs:', error);
-        return [];
+        return false;
     }
 }
 

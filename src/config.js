@@ -6,7 +6,14 @@ const WEBHOOK_URL =
 const GIF_URL = "https://discord.com/api/v9/gifs/search";
 const YANDEX_PUBLIC_FOLDER =
   process.env.YANDEX_PUBLIC_FOLDER || "https://disk.yandex.ru/d/3cAN4ZQO-bCXSA";
+const YANDEX_TARGET_FOLDER =
+  process.env.YANDEX_TARGET_FOLDER || "https://disk.yandex.ru/d/VVYz7xfRJPkooQ";
 
+const FROM_FOLDER = "standups";
+const TARGET_FOLDER = "standups_old";
+
+
+const YANDEX_OAUTH_TOKEN = process.env.YANDEX_OAUTH_TOKEN;
 const TELEGRAM_TOKEN = process.env.TELEGRAM_TOKEN;
 const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 
@@ -92,4 +99,8 @@ module.exports = {
   getDrinkGif,
   TELEGRAM_TOKEN,
   TELEGRAM_CHAT_ID,
+  YANDEX_TARGET_FOLDER,
+  YANDEX_OAUTH_TOKEN,
+  FROM_FOLDER,
+  TARGET_FOLDER
 };
