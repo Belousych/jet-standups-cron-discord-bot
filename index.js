@@ -21,7 +21,33 @@ const TELEGRAM_API_URL_TEXT = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sen
 const message_thread_id = 48; // standups thread id
 const message_thread_id_work_log = 40; // work log thread id
 
+
+let pinnedMessageIds = []; // Хранилище закрепленных сообщений бота
+
+const unpinBotMessages = async () => {
+  try {
+    // Убираем закрепление только своих сообщений
+    for (const messageId of pinnedMessageIds) {
+      await superagent
+        .post(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/unpinChatMessage`)
+        .send({
+          chat_id: TELEGRAM_CHAT_ID,
+          message_id: messageId,
+        })
+        .catch((error) => console.error("Error unpinning message:", error));
+    }
+
+    // Очищаем список после открепления
+    pinnedMessageIds = [];
+  } catch (error) {
+    console.error("Error unpinning bot messages:", error);
+  }
+};
+
+
 const sendMessage = async () => {
+    // Убираем закрепление своих сообщений
+  await unpinBotMessages();
   let today = new Date().toISOString().slice(0, 10);
   if (calendar && calendar?.holidays && calendar?.holidays.includes(today)) {
     return;
@@ -60,6 +86,7 @@ const sendMessage = async () => {
     ])}.** ${total > 0 ? "Когда они кончатся я буду искать сам" : ""}`;
   }
   try {
+  
     // Отправка сообщения в Telegram через superagent
     const res = await superagent
       .post(apiUrl)
@@ -92,6 +119,7 @@ const sendMessage = async () => {
     // Закрепление отправленного сообщения
     if (res.body && res.body.result && res.body.result.message_id) {
       const messageId = res.body.result.message_id;
+      pinnedMessageIds.push(messageId);
 
       await superagent
         .post(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/pinChatMessage`)
