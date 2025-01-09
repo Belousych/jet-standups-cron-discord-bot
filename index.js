@@ -1,17 +1,17 @@
-require("dotenv").config(); // Это должно быть первой строкой
-const CronJob = require("cron").CronJob;
-const superagent = require("superagent");
-const message = require("./message.json");
-const calendar = require("./superjob2024.json");
+require('dotenv').config(); // Это должно быть первой строкой
+const CronJob = require('cron').CronJob;
+const superagent = require('superagent');
+const message = require('./message.json');
+const calendar = require('./consultant2025.json'); //https://github.com/d10xa/holidays-calendar?tab=readme-ov-file
 const {
   gifQ,
   TELEGRAM_TOKEN,
   TELEGRAM_CHAT_ID,
   getDrinkGif,
-} = require("./src/config");
-const { findRandomGifs, getRandomGif } = require("./src/findRandomGifs");
-const getYandexGif = require("./src/getYandexGif");
-const { declOfNum, get_random } = require("./src/utils");
+} = require('./src/config');
+const { findRandomGifs, getRandomGif } = require('./src/findRandomGifs');
+const getYandexGif = require('./src/getYandexGif');
+const { declOfNum, get_random } = require('./src/utils');
 
 // Telegram API URL
 const TELEGRAM_API_URL = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendAnimation`;
@@ -21,32 +21,34 @@ const TELEGRAM_API_URL_TEXT = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sen
 const message_thread_id = 48; // standups thread id
 const message_thread_id_work_log = 40; // work log thread id
 
-
 let pinnedMessageIds = []; // Хранилище закрепленных сообщений бота
 
 const unpinBotMessages = async () => {
   try {
+    // Проверяем, нужно ли удалять закрепления
+    if (pinnedMessageIds.length <= 5) return;
+    // Получаем список сообщений для удаления, оставляя последние 5
+    const messagesToUnpin = pinnedMessageIds.slice(0, -5);
     // Убираем закрепление только своих сообщений
-    for (const messageId of pinnedMessageIds) {
+    for (const messageId of messagesToUnpin) {
       await superagent
         .post(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/unpinChatMessage`)
         .send({
           chat_id: TELEGRAM_CHAT_ID,
           message_id: messageId,
         })
-        .catch((error) => console.error("Error unpinning message:", error));
+        .catch((error) => console.error('Error unpinning message:', error));
     }
 
     // Очищаем список после открепления
     pinnedMessageIds = [];
   } catch (error) {
-    console.error("Error unpinning bot messages:", error);
+    console.error('Error unpinning bot messages:', error);
   }
 };
 
-
 const sendMessage = async () => {
-    // Убираем закрепление своих сообщений
+  // Убираем закрепление своих сообщений
   await unpinBotMessages();
   let today = new Date().toISOString().slice(0, 10);
   if (calendar && calendar?.holidays && calendar?.holidays.includes(today)) {
@@ -59,14 +61,14 @@ const sendMessage = async () => {
   const query = get_random(gifQ);
 
   let apiUrl = TELEGRAM_API_URL;
-  let mediaField = "animation";
+  let mediaField = 'animation';
   if (yandexResponse?.mime_type) {
     if (
-      yandexResponse?.mime_type === "image/png" ||
-      yandexResponse?.mime_type === "image/jpeg"
+      yandexResponse?.mime_type === 'image/png' ||
+      yandexResponse?.mime_type === 'image/jpeg'
     ) {
       apiUrl = TELEGRAM_API_URL_PICTURE;
-      mediaField = "photo";
+      mediaField = 'photo';
     }
   }
 
@@ -77,16 +79,15 @@ const sendMessage = async () => {
 
   const total = yandexResponse?.total;
   if (yandexResponse && total >= 0 && total <= 3) {
-    messageNext.content += `\n\n**${"🔥".repeat(
+    messageNext.content += `\n\n**${'🔥'.repeat(
       4 - total
     )} в папке осталось  ${total} ${declOfNum(total, [
-      "картинка",
-      "картинки",
-      "картинок",
-    ])}.** ${total > 0 ? "Когда они кончатся я буду искать сам" : ""}`;
+      'картинка',
+      'картинки',
+      'картинок',
+    ])}.** ${total > 0 ? 'Когда они кончатся я буду искать сам' : ''}`;
   }
   try {
-  
     // Отправка сообщения в Telegram через superagent
     const res = await superagent
       .post(apiUrl)
@@ -111,10 +112,10 @@ const sendMessage = async () => {
 - Ставить лайки, делать суб-обсуждения и т.п. — **очень хорошо!**
 - Постить гифки и стикеры — в меру — **хорошо!**
 `,
-        parse_mode: "Markdown",
+        parse_mode: 'Markdown',
       })
       // .then(res => console.log('Message sent:', res.body))
-      .catch((error) => console.error("Error sending message:", error));
+      .catch((error) => console.error('Error sending message:', error));
 
     // Закрепление отправленного сообщения
     if (res.body && res.body.result && res.body.result.message_id) {
@@ -127,10 +128,10 @@ const sendMessage = async () => {
           chat_id: TELEGRAM_CHAT_ID,
           message_id: messageId,
         })
-        .catch((error) => console.error("Error pinning message:", error));
+        .catch((error) => console.error('Error pinning message:', error));
     }
   } catch (error) {
-    console.error("Error sending message:", error);
+    console.error('Error sending message:', error);
   }
 };
 
@@ -168,25 +169,25 @@ const sendMessageTea = async () => {
           chat_id: TELEGRAM_CHAT_ID,
           message_id: messageId,
         })
-        .catch((error) => console.error("Error pinning message:", error));
+        .catch((error) => console.error('Error pinning message:', error));
     }
   } catch (error) {
-    console.error("Error sendMessageTea message:", error);
+    console.error('Error sendMessageTea message:', error);
   }
 };
 
 const sendMessageWorkLog = async () => {
   try {
     // Отправка сообщения в Telegram через superagent
-    const res = await superagent.post(TELEGRAM_API_URL_TEXT).send({ // TODO сделать картинки
+    const res = await superagent.post(TELEGRAM_API_URL_TEXT).send({
+      // TODO сделать картинки
       chat_id: TELEGRAM_CHAT_ID,
       message_thread_id: message_thread_id_work_log,
       text: 'Заполни ворклоги и спи спокойно!',
     });
 
-
-     // Закрепление отправленного сообщения
-     if (res.body && res.body.result && res.body.result.message_id) {
+    // Закрепление отправленного сообщения
+    if (res.body && res.body.result && res.body.result.message_id) {
       const messageId = res.body.result.message_id;
 
       await superagent
@@ -195,50 +196,47 @@ const sendMessageWorkLog = async () => {
           chat_id: TELEGRAM_CHAT_ID,
           message_id: messageId,
         })
-        .catch((error) => console.error("Error pinning message:", error));
+        .catch((error) => console.error('Error pinning message:', error));
     }
-    
   } catch (error) {
-    console.error("Error sendMessageWorkLog message:", error);
+    console.error('Error sendMessageWorkLog message:', error);
   }
-}
-
+};
 
 // Расписание для sendMessage
 new CronJob(
-  "30 9 * * 1-6",
+  '30 9 * * 1-6',
   () => {
-    console.log("CronJob for sendMessage triggered");
+    console.log('CronJob for sendMessage triggered');
     sendMessage();
   },
   null,
   true,
-  "Asia/Yekaterinburg"
+  'Asia/Yekaterinburg'
 ).start();
 
 // Расписание для sendMessageTea
 new CronJob(
-  "00 16 * * 5",
+  '00 16 * * 5',
   () => {
-    console.log("CronJob for sendMessageTea triggered");
+    console.log('CronJob for sendMessageTea triggered');
     sendMessageTea();
   },
   null,
   true,
-  "Asia/Yekaterinburg"
+  'Asia/Yekaterinburg'
 ).start();
-
 
 // Расписание для sendMessageWorkLog
 new CronJob(
-  "00 18 * * 4",
+  '00 18 * * 4',
   () => {
-    console.log("CronJob for sendMessageWorkLog triggered");
+    console.log('CronJob for sendMessageWorkLog triggered');
     sendMessageWorkLog();
   },
   null,
   true,
-  "Asia/Yekaterinburg"
+  'Asia/Yekaterinburg'
 ).start();
 
 // sendMessage();
