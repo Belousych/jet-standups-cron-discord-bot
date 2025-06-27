@@ -4,6 +4,9 @@ const { get_random } = require("./utils");
 
 let used_id = [];
 
+// const FILE_SIZE_LIMIT = 8388608; // 8 MB
+const FILE_SIZE_LIMIT = 15728640; // 15 MB
+
 const getYandexGif = async () => {
   const folder = await superagent
     .get(
@@ -15,14 +18,17 @@ const getYandexGif = async () => {
 
   if (folder?._embedded) {
     const items = folder?._embedded?.items || [];
-    const itemsFiltered = items.filter(
-      (i) => !used_id.includes(i.resource_id) && i.size < 8388608
+    let itemsFiltered = items.filter(
+      (i) => !used_id.includes(i.resource_id) && i.size < FILE_SIZE_LIMIT
     );
-    const randomItem = get_random(itemsFiltered);
 
-    if (!items.length) {
+    // Если после фильтрации не осталось ни одной картинки, сбрасываем used_id и фильтруем заново
+    if (itemsFiltered.length === 0 && items.length > 0) {
       used_id = [];
+      itemsFiltered = items.filter((i) => i.size < FILE_SIZE_LIMIT);
     }
+
+    const randomItem = get_random(itemsFiltered);
 
     if (randomItem) {
       if (YANDEX_OAUTH_TOKEN) {
@@ -58,6 +64,7 @@ const getYandexGif = async () => {
         ...randomItem,
       };
     } else {
+      used_id = [];
       return null;
     }
   } else {

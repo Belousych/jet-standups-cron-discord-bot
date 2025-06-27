@@ -21,12 +21,14 @@ const TELEGRAM_API_URL_TEXT = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sen
 const message_thread_id = 48; // standups thread id
 const message_thread_id_work_log = 40; // work log thread id
 
+const PINNED_MESSAGES_LIMIT = 7; // Максимальное количество закрепленных сообщений
+
 let pinnedMessageIds = []; // Хранилище закрепленных сообщений бота
 
 const unpinBotMessages = async () => {
   try {
     // Проверяем, нужно ли удалять закрепления
-    if (pinnedMessageIds.length <= 5) return;
+    if (pinnedMessageIds.length <= PINNED_MESSAGES_LIMIT) return;
     // Получаем список сообщений для удаления, оставляя последние 5
     const messagesToUnpin = pinnedMessageIds.slice(0, -5);
     // Убираем закрепление только своих сообщений
