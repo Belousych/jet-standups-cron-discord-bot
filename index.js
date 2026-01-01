@@ -2,7 +2,7 @@ require('dotenv').config(); // Это должно быть первой стр�
 const CronJob = require('cron').CronJob;
 const superagent = require('superagent');
 const message = require('./message.json');
-const calendar = require('./consultant2025.json'); //https://github.com/d10xa/holidays-calendar?tab=readme-ov-file
+const calendar = require('./consultant2026.json'); //https://github.com/d10xa/holidays-calendar?tab=readme-ov-file
 const {
   gifQ,
   TELEGRAM_TOKEN,
