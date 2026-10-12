@@ -1,79 +1,29 @@
-const superagent = require("superagent");
-const { YANDEX_PUBLIC_FOLDER, FROM_FOLDER, TARGET_FOLDER, YANDEX_OAUTH_TOKEN } = require("./config");
-const { get_random } = require("./utils");
+const superagent = require('superagent');
+const { YANDEX_PUBLIC_FOLDER, FROM_FOLDER, TARGET_FOLDER, YANDEX_OAUTH_TOKEN } = require('./config');
+const { get_random } = require('./utils');
+let usedIds = [];
+const FILE_SIZE_LIMIT = 15728640;
 
-let used_id = [];
+async function getYandexGif() {
+  const response = await superagent.get('https://cloud-api.yandex.net/v1/disk/public/resources')
+    .query({ public_key: YANDEX_PUBLIC_FOLDER, limit: 1000 })
+    .timeout({ response: 10000, deadline: 20000 });
+  const items = (response.body?._embedded?.items || []).filter(item =>
+    item.type === 'file' && item.file && item.mime_type?.startsWith('image/') && item.size < FILE_SIZE_LIMIT);
+  let available = items.filter(item => !usedIds.includes(item.resource_id));
+  if (!available.length) { usedIds = []; available = items; }
+  const item = get_random(available);
+  return item ? { ...item, url: item.file, total: available.length - 1 } : null;
+}
 
-// const FILE_SIZE_LIMIT = 8388608; // 8 MB
-const FILE_SIZE_LIMIT = 15728640; // 15 MB
-
-const getYandexGif = async () => {
-  const folder = await superagent
-    .get(
-      `https://cloud-api.yandex.net/v1/disk/public/resources?public_key=${encodeURI(
-        YANDEX_PUBLIC_FOLDER
-      )}`
-    )
-    .then((res) => res.body);
-
-  if (folder?._embedded) {
-    const items = folder?._embedded?.items || [];
-    let itemsFiltered = items.filter(
-      (i) => !used_id.includes(i.resource_id) && i.size < FILE_SIZE_LIMIT
-    );
-
-    // Если после фильтрации не осталось ни одной картинки, сбрасываем used_id и фильтруем заново
-    if (itemsFiltered.length === 0 && items.length > 0) {
-      used_id = [];
-      itemsFiltered = items.filter((i) => i.size < FILE_SIZE_LIMIT);
-    }
-
-    const randomItem = get_random(itemsFiltered);
-
-    if (randomItem) {
-      if (YANDEX_OAUTH_TOKEN) {
-        try {
-          await superagent
-            .post(
-              `https://cloud-api.yandex.net/v1/disk/resources/move?from=${encodeURIComponent(
-                `disk:/${FROM_FOLDER}/${randomItem.name}`
-              )}&path=${encodeURIComponent(
-                `disk:/${TARGET_FOLDER}/${randomItem.name}`
-              )}`
-            )
-            .set("Authorization", `OAuth ${YANDEX_OAUTH_TOKEN}`)
-            .catch((error) => console.error("Move error:", error));
-
-          used_id.push(randomItem.resource_id);
-        } catch (error) {
-            used_id.push(randomItem.resource_id);
-            console.error("Move error:", error)
-        }
-        // await superagent
-        //     .delete(encodeURI(`https://cloud-api.yandex.net/v1/disk/resources?path=/${folder.name}${randomItem.path}`))
-        //     .set('Authorization', `OAuth ${YANDEX_OAUTH_TOKEN}`)
-        //     .then(res => res.body)
-        //     .catch(error => console.error(error))
-        
-      } else {
-        used_id.push(randomItem.resource_id);
-      }
-      return {
-        total: itemsFiltered.length - 1,
-        url: randomItem.file,
-        ...randomItem,
-      };
-    } else {
-      used_id = [];
-      return null;
-    }
-  } else {
-    used_id = [];
-    return null;
-  }
-};
-
-
-
-
+// Call only after Telegram has successfully sent this exact image.
+async function markYandexGifSent(item) {
+  usedIds.push(item.resource_id);
+  if (!YANDEX_OAUTH_TOKEN) return;
+  await superagent.post('https://cloud-api.yandex.net/v1/disk/resources/move')
+    .query({ from: `disk:/${FROM_FOLDER}/${item.name}`, path: `disk:/${TARGET_FOLDER}/${item.name}` })
+    .set('Authorization', `OAuth ${YANDEX_OAUTH_TOKEN}`)
+    .timeout({ response: 10000, deadline: 20000 });
+}
 module.exports = getYandexGif;
+module.exports.markYandexGifSent = markYandexGifSent;

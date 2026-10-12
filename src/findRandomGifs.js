@@ -40,20 +40,21 @@ const findRandomGifs = async (gifs = []) => {
 
 async function getRandomGif(query) {
     try {
+        if (!process.env.API_KEY_GIPHY) return null;
         const response = await superagent
             .get('https://api.giphy.com/v1/gifs/search')
             .query({
                 api_key: process.env.API_KEY_GIPHY,
                 q: query,
                 limit: 50
-            });
+            }).timeout({ response: 10000, deadline: 20000 });
 
         // Маппим результаты на массив ссылок
         const gifs = response.body.data.map(gif => gif.images.original.url);
         const item = get_random(gifs)
         return item;
     } catch (error) {
-        console.error('Error fetching GIFs:', error);
+        console.error('Error fetching GIFs:', error.response?.body?.message || error.code || 'Request failed');
         return false;
     }
 }

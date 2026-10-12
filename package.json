@@ -2,7 +2,11 @@
   "name": "jet-standups-cron-discord-bot",
   "version": "0.1.0",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "send:standup": "node send-once.js standup",
+    "send:tea": "node send-once.js tea",
+    "send:worklog": "node send-once.js worklog",
+    "test": "node --test"
   },
   "dependencies": {
     "cron": "^2.2.0",
