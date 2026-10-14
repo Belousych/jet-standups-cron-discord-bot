@@ -34,10 +34,23 @@ async function telegram(method, payload) {
 }
 async function tryMedia(media, text) {
   if (!media?.url) return null;
-  const photo = ['image/png', 'image/jpeg'].includes(media.mime_type);
+  let method = 'sendAnimation';
+  let mediaField = 'animation';
+  const extra = {};
+  if (['image/png', 'image/jpeg'].includes(media.mime_type)) {
+    method = 'sendPhoto';
+    mediaField = 'photo';
+  } else if (media.mime_type === 'video/mp4') {
+    method = 'sendVideo';
+    mediaField = 'video';
+    extra.supports_streaming = true;
+  }
   try {
-    return await telegram(photo ? 'sendPhoto' : 'sendAnimation', {
-      message_thread_id: 48, [photo ? 'photo' : 'animation']: media.url, caption: text,
+    return await telegram(method, {
+      message_thread_id: 48,
+      [mediaField]: media.url,
+      caption: text,
+      ...extra,
     });
   } catch (error) { logError('Media send failed; trying fallback', error); return null; }
 }
@@ -56,18 +69,29 @@ async function pinMessage(message, track = false) {
 async function sendMessage({ force = false } = {}) {
   if (skipHoliday(force)) return;
   let media;
+  let source = 'text';
   try { media = await getYandexGif(); }
   catch (error) { logError('Yandex unavailable; trying Giphy', error); }
+  if (media) {
+    console.log('Yandex image selected:', {
+      name: media.name,
+      remainingCandidates: media.total,
+    });
+  } else {
+    console.log('Yandex returned no eligible image; trying Giphy');
+  }
   let sent = await tryMedia(media, STANDUP_TEXT);
   if (sent) {
+    source = 'Yandex';
     try { await markYandexGifSent(media); }
     catch (error) { logError('Image sent, but archive move failed', error); }
   } else {
     const url = await getRandomGif(get_random(gifQ));
     sent = await tryMedia({ url }, STANDUP_TEXT);
+    if (sent) source = 'Giphy';
   }
   if (!sent) sent = await telegram('sendMessage', { message_thread_id: 48, text: STANDUP_TEXT });
-  console.log('Standup sent:', sent.message_id);
+  console.log('Standup sent:', { messageId: sent.message_id, source });
   await pinMessage(sent, true);
 }
 async function sendMessageTea({ force = false } = {}) {
